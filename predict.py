@@ -22,7 +22,7 @@ if __name__ == "__main__":
     #   'heatmap'           表示进行预测结果的热力图可视化，详情查看下方注释。
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #----------------------------------------------------------------------------------------------------------#
-    mode = "export_onnx"
+    mode = "predict"
     det_img_path = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/image008_yuv444"
     #-------------------------------------------------------------------------#
     #   crop                指定了是否在单张图片预测后对目标进行截取
@@ -100,15 +100,13 @@ if __name__ == "__main__":
             # gene_image = np.concatenate([image_left, image_right], axis=1)
             # # gene_image = np.array(gene_image, dtype='int8')
             # gene_image = Image.fromarray(gene_image)
-
-
             image_crop = image[80:, :, :]
             test_img = cv2.resize(image_crop, (640, 320), interpolation=cv2.INTER_LINEAR)
             #####################
-            img_0 = cv2.resize(test_img, (256, 128), interpolation=cv2.INTER_LINEAR)
-            img_1 = test_img[96:96+128,192:192+256, :]
-            gene_image = np.concatenate([img_0, img_1], axis=1)
-            gene_image = Image.fromarray(gene_image)
+            # img_0 = cv2.resize(test_img, (256, 128), interpolation=cv2.INTER_LINEAR)
+            # img_1 = test_img[96:96+128,192:192+256, :]
+            # gene_image = np.concatenate([img_0, img_1], axis=1)
+            gene_image = Image.fromarray(test_img)
 
             r_image = yolo.detect_image(image, gene_image,multi_roi, crop = crop, count=count)
             r_image.save(os.path.join(save_path,file))

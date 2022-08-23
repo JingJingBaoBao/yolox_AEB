@@ -47,7 +47,7 @@ class YoloDataset(Dataset):
                 image_2, box_2 = self.get_random_data(lines[0], self.input_shape, random=self.train)
                 image, box = self.get_random_data_with_MixUp(image, box, image_2, box_2)
         else:
-            image, box = self.process_data(self.annotation_lines[index], self.neg_images_lines[index_neg], self.input_shape, random=self.train)
+            image, box = self.process_data_one_roi(self.annotation_lines[index], self.neg_images_lines[index_neg], self.input_shape)
 
         # 生成image和box
         # lines = sample(self.annotation_lines, 3)
@@ -74,8 +74,55 @@ class YoloDataset(Dataset):
         gene_image = np.concatenate([img_0, img_1], axis=1)
 
         return gene_image
+    def process_data_one_roi(self, annotation_line, neg_lines, input_shape):
+        line = annotation_line.split()
+        neg_line = neg_lines.strip()
 
-    def process_data(self, annotation_line, neg_lines, input_shape, random=True):
+        pos_image = cv2.imread(line[0])
+        neg_image = cv2.imread(neg_line)
+        pos_image = pos_image[80:, :, :]
+        neg_image = neg_image[80:, :, :]
+        pos_image = cv2.resize(pos_image, (640, 320), interpolation=cv2.INTER_LINEAR)
+        neg_image = cv2.resize(neg_image, (640, 320), interpolation=cv2.INTER_LINEAR)
+        image_arr = np.concatenate([pos_image, neg_image],axis=1)
+        image = Image.fromarray(image_arr)
+        h, w = input_shape
+        box = np.array([np.array(list(map(int, box.split(',')))) for box in line[1:]])
+        if len(box) > 0:
+            np.random.shuffle(box)
+
+            box[:, [0, 2]] = box[:, [0, 2]] / 2 
+            box[:, [1, 3]] = (box[:, [1, 3]] - 80) / 2
+            # box_2[:, 0:2][box_2[:, 0:2] < 0] = 0
+            box[:, 0][box[:, 0] < 0] = 0
+            box[:, 2][box[:, 2] > w/2] = w/2
+            box[:, 1][box[:, 1] < 0] = 0
+            box[:, 3][box[:, 3] > h] = h
+            box_w = box[:, 2] - box[:, 0]
+            box_h = box[:, 3] - box[:, 1]
+            box = box[np.logical_and(box_w > 1, box_h > 1)]
+
+        final_box = []
+        for b in box:
+            final_box.append(np.array(list(b)))
+
+        final_box = np.array(final_box)
+
+        # for box in final_box:
+        #     xmin, ymin, xmax, ymax, label = box
+        #     xmin, ymin, xmax, ymax = int(xmin), int(ymin), int(xmax), int(ymax)
+        #     if int(label) == 0:
+        #         cv2.rectangle(image_arr, (xmin, ymin), (xmax, ymax-1), (0, 0, 255), 1)
+        #     elif int(label) == 1:
+        #         cv2.rectangle(image_arr, (xmin, ymin), (xmax, ymax-1), (0, 255, 255), 1)
+        #     elif int(label) == 2:
+        #         cv2.rectangle(image_arr, (xmin, ymin), (xmax, ymax-1), (0, 255, 0), 1)
+
+        # cv2.imwrite(os.path.join("/home/sunxusheng/projects/yolox/yolox-pytorch-main/box_debug", line[0].split('/')[-1]), image_arr)
+
+        return image, final_box
+
+    def process_data(self, annotation_line, neg_lines, input_shape):
         # image 要转成numpy格式
         
         line = annotation_line.split()

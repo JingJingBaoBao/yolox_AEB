@@ -26,12 +26,12 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_19/ep002-loss13.576-val_loss4.626.pth',
+        "model_path"        : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_19/ep065-loss2.375-val_loss2.154.pth',
         "classes_path"      : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/model_data/voc_classes.txt',
         #---------------------------------------------------------------------#
         #   输入图片的大小，必须为32的倍数。 h, w
         #---------------------------------------------------------------------#
-        "input_shape"       : [128,512],
+        "input_shape"       : [320,640],
         #---------------------------------------------------------------------#
         #   所使用的YoloX的版本。nano、tiny、s、m、l、x
         #---------------------------------------------------------------------#
@@ -179,7 +179,7 @@ class YOLO(object):
         image = cv2.cvtColor(image, cv2.COLOR_YUV2RGB)
   
         image = Image.fromarray(np.array(image))
-        scale1, scale2 = 0.2, 0.5
+        scale1, scale2 = 0.5, 0.5
         for i, c in list(enumerate(top_label)):
             predicted_class = self.class_names[int(c)]
             box             = top_boxes[i]
@@ -191,16 +191,16 @@ class YOLO(object):
             bottom  = min(float(image.size[1]), np.floor(bottom).astype('float32'))
             right   = min(float(image.size[0]), np.floor(right).astype('float32'))
 
-            if left < 256:
-                left = left / scale1
-                top = top / scale1 + 80
-                bottom = bottom / scale1 + 80
-                right = right / scale1 
-            else:
-                left = (left - 256) / scale2 + 192 * 2
-                top = (top + 96) / scale2 + 80
-                bottom = (bottom + 96) / scale2 + 80
-                right = (right - 256) / scale2 + 192 * 2
+            # if left < 256:
+            left = left / scale1
+            top = top / scale1 + 80
+            bottom = bottom / scale1 + 80
+            right = right / scale1 
+            # else:
+            #     left = (left - 256) / scale2 + 192 * 2
+            #     top = (top + 96) / scale2 + 80
+            #     bottom = (bottom + 96) / scale2 + 80
+            #     right = (right - 256) / scale2 + 192 * 2
 
             label = '{} {:.2f}'.format(predicted_class, score)
             draw = ImageDraw.Draw(image)

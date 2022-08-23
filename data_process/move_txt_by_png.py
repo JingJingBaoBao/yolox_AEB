@@ -15,22 +15,10 @@ with open(txt_path, 'r') as f:
         if len(file.split()) == 2:
             image, label = file.split()
             post_fix = image.split('/')[-2].split('data')[-1]
-            # image_file = image.split('/')[-1]
             label_file = label.split('/')[-1]
-
-            # save_file =  image_file.split('_W1280')[0] + post_fix + "_W1280" +  image_file.split('_W1280')[-1]
             save_file =  label_file.split('_W1280')[0] + post_fix + "_W1280" +  label_file.split('_W1280')[-1]
-
-            # print(save_file)
             shutil.copy(label, osp.join(dst_path_train, save_file))
-        # else:
-        #     image = file.strip()
-        #     # post_fix = image.split('/')[-2].split('data')[-1]
-        #     image_file = image.split('/')[-1]
-        #     # save_file =  image_file.split('_W1280')[0] + post_fix + "_W1280" +  image_file.split('_W1280')[-1]
-        #     # print(image_file)
-        #     # exit(-1)
-        #     shutil.copy(image, osp.join(dst_path_val, image_file))
+
 
 
 print("Done!")

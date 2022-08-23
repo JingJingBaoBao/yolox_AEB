@@ -6,10 +6,12 @@ from tqdm import tqdm
 from utils.utils import get_lr
 
 
-def fit_one_epoch(model_train, model, ema, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, Epoch, cuda, fp16, scaler, save_period, save_dir, local_rank=0):
+def fit_one_epoch(model_train, model, ema, yolo_loss, loss_history, eval_callback, 
+                    optimizer, epoch, epoch_step, epoch_step_val, gen, gen_val, Epoch, cuda, fp16, 
+                    scaler, save_period, save_dir, qat_processor, local_rank=0):
     loss        = 0
     val_loss    = 0
-
+    deploy_model_filepath = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/deploy_log/deploy_model.pth"
     if local_rank == 0:
         print('Start Train')
         pbar = tqdm(total=epoch_step,desc=f'Epoch {epoch + 1}/{Epoch}',postfix=dict,mininterval=0.3)
@@ -131,3 +133,7 @@ def fit_one_epoch(model_train, model, ema, yolo_loss, loss_history, eval_callbac
             torch.save(save_state_dict, os.path.join(save_dir, "best_epoch_weights.pth"))
             
         torch.save(save_state_dict, os.path.join(save_dir, "last_epoch_weights.pth"))
+       
+        output_dir = 'qat_result' #文件夹中会生成量化信息文件quant_info.json
+        deployable_net = qat_processor.convert_to_deployable(model, output_dir=output_dir)
+        torch.save(deployable_net.state_dict(), deploy_model_filepath , _use_new_zipfile_serialization=False)#储存模型，测试与部署用
