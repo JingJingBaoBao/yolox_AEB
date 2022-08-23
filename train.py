@@ -45,7 +45,7 @@ if __name__ == "__main__":
     UnFreeze_Epoch      = 100
     Unfreeze_batch_size = 64
     Freeze_Train        = False
-    Init_lr             = 1e-3
+    Init_lr             = 1e-4
     Min_lr              = Init_lr * 0.1
     optimizer_type      = "adam"
     momentum            = 0.937
