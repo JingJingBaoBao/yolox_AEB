@@ -14,6 +14,7 @@ day = []
 night = []
 cutin = []
 pd = []
+big = []
 
 for dir in data_dir_list:
     for root, dir, files in os.walk(dir):
@@ -38,7 +39,7 @@ for l in all_list:
     for i in range(len(l)):
         try:
             with open(l[i], 'r') as f:
-                string = l[i]
+                string = l[i].replace('txt', 'png').replace('label_process_', '')
                 for line in f.readlines():
                     label, xmin, ymin, xmax, ymax = line.split()
                     if label == "10":
@@ -53,23 +54,25 @@ for l in all_list:
         except:
             print(l[i])
 
-night_idx, cutin_idx, pd_idx = 0, 0, 0
-with open(osp.join(save_path, "voc_train_list.txt"), 'w') as f:
-    for i in range(len(day)):
-        f.write(day[i]+'\n')
-        night_idx %= len(night)
-        f.write(night[night_idx]+'\n')
-        night_idx += 1
+print(day)
 
-        if i % 2 == 0:
-            cutin_idx %= len(cutin)
-            f.write(cutin[cutin_idx]+'\n')
-            cutin_idx += 1
+# night_idx, cutin_idx, pd_idx = 0, 0, 0
+# with open(osp.join(save_path, "voc_train_list.txt"), 'w') as f:
+#     for i in range(len(day)):
+#         f.write(day[i]+'\n')
+#         night_idx %= len(night)
+#         f.write(night[night_idx]+'\n')
+#         night_idx += 1
+
+#         if i % 2 == 0:
+#             cutin_idx %= len(cutin)
+#             f.write(cutin[cutin_idx]+'\n')
+#             cutin_idx += 1
         
-        if i % 4 == 0:
-            pd_idx %= len(pd)
-            f.write(pd[pd_idx]+'\n')
-            pd_idx += 1
+#         if i % 4 == 0:
+#             pd_idx %= len(pd)
+#             f.write(pd[pd_idx]+'\n')
+#             pd_idx += 1
 
 
 
