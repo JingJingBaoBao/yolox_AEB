@@ -12,8 +12,7 @@ for item in txt_list:
     if item.find('night_data') != -1:
         print(item)
         with open(item) as fr:
-            tmp = fr.readlines()
-            night = night + tmp
+            night = fr.readlines()
             np.random.shuffle(night)
             np.random.shuffle(night)
     elif item.find('data_pd_more8') != -1:
@@ -44,20 +43,20 @@ for item in txt_list:
             np.random.shuffle(cutin)
             np.random.shuffle(cutin)
         print(item)
-    # elif item.find('data_diff')!= -1:
-    #     with open(item) as fr:
-    #         diff = fr.readlines()
-    #         # diff = diff+tmp
-    #         np.random.shuffle(diff)
-    #         np.random.shuffle(diff)
-    #     print(item)
-    # elif item.find('list_neg')!= -1:
-    #     with open(item) as fr:
-    #         neg = fr.readlines()
-    #         # diff = diff+tmp
-    #         np.random.shuffle(neg)
-    #         np.random.shuffle(neg)
-    #     print(item)
+    elif item.find('data_diff')!= -1:
+        with open(item) as fr:
+            diff = fr.readlines()
+            # diff = diff+tmp
+            np.random.shuffle(diff)
+            np.random.shuffle(diff)
+        print(item)
+    elif item.find('list_neg')!= -1:
+        with open(item) as fr:
+            neg = fr.readlines()
+            # diff = diff+tmp
+            np.random.shuffle(neg)
+            np.random.shuffle(neg)
+        print(item)
     elif item.find('train_list')!= -1:
         continue
     elif item.find('special')!= -1:
@@ -139,6 +138,6 @@ with open(fr'/media/sm/data2/luojie/centernet_data/voc/ImageSets/Main/coco_train
     for sub in write_list_train:
         fw.write('%s'%sub)
 
-# with open(fr'/media/sm/data2/luojie/centernet_data/voc/ImageSets/Main/coco_val_list.txt','w') as fw:
-#     for sub in write_list_val:
-#         fw.write('%s'%sub)
+with open(fr'/media/sm/data2/luojie/centernet_data/voc/ImageSets/Main/coco_val_list.txt','w') as fw:
+    for sub in write_list_val:
+        fw.write('%s'%sub)

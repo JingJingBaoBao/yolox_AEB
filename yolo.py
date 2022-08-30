@@ -26,7 +26,7 @@ class YOLO(object):
         #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
         #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
         #--------------------------------------------------------------------------#
-        "model_path"        : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_24/ep019-loss2.294-val_loss2.152.pth',
+        "model_path"        : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_29/ep004-lossnan-val_loss5.046.pth',
         "classes_path"      : '/home/sunxusheng/projects/yolox/yolox-pytorch-main/model_data/voc_classes.txt',
         #---------------------------------------------------------------------#
         #   输入图片的大小，必须为32的倍数。 h, w
@@ -180,50 +180,50 @@ class YOLO(object):
   
         image = Image.fromarray(np.array(image))
         scale1, scale2 = 0.5, 0.5
-        with open(os.path.join(file_save_path, file.replace('png', 'txt')), "w") as f:
+        # with open(os.path.join(file_save_path, file.replace('png', 'txt')), "w") as f:
 
-            for i, c in list(enumerate(top_label)):
-                predicted_class = self.class_names[int(c)]
-                box             = top_boxes[i]
-                score           = top_conf[i]
+        for i, c in list(enumerate(top_label)):
+            predicted_class = self.class_names[int(c)]
+            box             = top_boxes[i]
+            score           = top_conf[i]
 
-                top, left, bottom, right = box
-                top     = max(0.0, np.floor(top).astype('float32'))
-                left    = max(0.0, np.floor(left).astype('float32'))
-                bottom  = min(float(image.size[1]), np.floor(bottom).astype('float32'))
-                right   = min(float(image.size[0]), np.floor(right).astype('float32'))
+            top, left, bottom, right = box
+            top     = max(0.0, np.floor(top).astype('float32'))
+            left    = max(0.0, np.floor(left).astype('float32'))
+            bottom  = min(float(image.size[1]), np.floor(bottom).astype('float32'))
+            right   = min(float(image.size[0]), np.floor(right).astype('float32'))
 
-                # if left < 256:
-                left = left / scale1
-                top = top / scale1 + 80
-                bottom = bottom / scale1 + 80
-                right = right / scale1 
-                # else:
-                #     left = (left - 256) / scale2 + 192 * 2
-                #     top = (top + 96) / scale2 + 80
-                #     bottom = (bottom + 96) / scale2 + 80
-                #     right = (right - 256) / scale2 + 192 * 2
+            # if left < 256:
+            left = left / scale1
+            top = top / scale1 + 80
+            bottom = bottom / scale1 + 80
+            right = right / scale1 
+            # else:
+            #     left = (left - 256) / scale2 + 192 * 2
+            #     top = (top + 96) / scale2 + 80
+            #     bottom = (bottom + 96) / scale2 + 80
+            #     right = (right - 256) / scale2 + 192 * 2
 
-                label = '{} {:.2f}'.format(predicted_class, score)
-                draw = ImageDraw.Draw(image)
-                label_size = draw.textsize(label, font)
-                label = label.encode('utf-8')
-    
-                if top - label_size[1] >= 0:
-                    text_origin = np.array([left, top - label_size[1]])
-                else:
-                    text_origin = np.array([left, top + 1])
+            label = '{} {:.2f}'.format(predicted_class, score)
+            draw = ImageDraw.Draw(image)
+            label_size = draw.textsize(label, font)
+            label = label.encode('utf-8')
 
-                # for i in range(thickness):
-                    # print("i = ",i)
-                    # draw.rectangle([left + i, top + i, right - i, bottom - i], outline=self.colors[c])
-                    # draw.rectangle([left, top, right, bottom], outline=self.colors[c])
-                    # draw.rectangle([(int(left+i), int(top+i)), (int(right+i), int(bottom+i))], outline=self.colors[c])
-                f.write(str(c) + " " + str(score) + " " + str(int(left)) + " " + str(int(top))+ " " + str(int(right))+ " " + str(int(bottom))+ "\n")
-                draw.rectangle([(int(left), int(top)), (int(right), int(bottom))], outline=self.colors[c])
-                draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=self.colors[c])
-                draw.text(text_origin, str(label,'UTF-8'), fill=(0, 0, 0), font=font)
-                del draw
+            if top - label_size[1] >= 0:
+                text_origin = np.array([left, top - label_size[1]])
+            else:
+                text_origin = np.array([left, top + 1])
+
+            # for i in range(thickness):
+            #     print("i = ",i)
+            #     draw.rectangle([left + i, top + i, right - i, bottom - i], outline=self.colors[c])
+            #     draw.rectangle([left, top, right, bottom], outline=self.colors[c])
+            #     draw.rectangle([(int(left+i), int(top+i)), (int(right+i), int(bottom+i))], outline=self.colors[c])
+            # f.write(str(c) + " " + str(score) + " " + str(int(left)) + " " + str(int(top))+ " " + str(int(right))+ " " + str(int(bottom))+ "\n")
+            draw.rectangle([(int(left), int(top)), (int(right), int(bottom))], outline=self.colors[c])
+            draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=self.colors[c])
+            draw.text(text_origin, str(label,'UTF-8'), fill=(0, 0, 0), font=font)
+            del draw
 
         return image
     

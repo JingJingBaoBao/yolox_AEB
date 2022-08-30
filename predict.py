@@ -112,7 +112,7 @@ if __name__ == "__main__":
             gene_image = Image.fromarray(test_img)
 
             r_image = yolo.detect_image(image, gene_image,file_save_path, file, crop = crop, count=count)
-            #r_image.save(os.path.join(save_path,file))
+            r_image.save(os.path.join(save_path,file))
             # exit(1)
 
     elif mode == "video":
