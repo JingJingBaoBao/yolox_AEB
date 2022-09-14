@@ -24,7 +24,7 @@ if __name__ == "__main__":
     #   'export_onnx'       表示将模型导出为onnx，需要pytorch1.7.1以上。
     #----------------------------------------------------------------------------------------------------------#
     mode = "predict"
-    det_img_path = "/media/edata/sunxusheng/ground_truth/day"
+    det_img_path = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/bus_cut_yuv444"
     #-------------------------------------------------------------------------#
     #   crop                指定了是否在单张图片预测后对目标进行截取
     #   count               指定了是否进行目标的计数
@@ -84,7 +84,7 @@ if __name__ == "__main__":
         比如判断if predicted_class == 'car': 即可判断当前目标是否为车，然后记录数量即可。利用draw.text即可写字。
         '''
         multi_roi = False
-        save_path = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/night_res"
+        save_path = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/bus_res"
         if os.path.exists(save_path):
             shutil.rmtree(save_path)
         os.makedirs(save_path, exist_ok=True)

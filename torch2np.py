@@ -5,7 +5,7 @@ import numpy as np
 from nets import yolo
 from yolo import YoloBody
 
-model_file = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_24/ep041-loss2.208-val_loss2.144.pth"
+model_file = "/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_09_13/ep012-loss2.311-val_loss2.108.pth"
 net    = YoloBody(3, 'nano')
 net.eval()
 ckpt = torch.load(model_file)
@@ -18,5 +18,5 @@ for k,v in net.state_dict().items():
     print(k)
     weights[k] = v
 
-np.save("./yolox_numpy_0826.npy", weights)
+np.save("./yolox_numpy_0914.npy", weights)
 

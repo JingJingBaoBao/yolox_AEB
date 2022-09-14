@@ -23,6 +23,7 @@ import warnings
 warnings.filterwarnings("ignore")
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
+
 if __name__ == "__main__":
     Cuda            = True
     #---------------------------------------------------------------------#
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     #       设置            distributed = True
     #       在终端中输入    CUDA_VISIBLE_DEVICES=0,1 python -m torch.distributed.launch --nproc_per_node=2 train.py
     #---------------------------------------------------------------------#
-    distributed     = False
+    distributed     = True
     #---------------------------------------------------------------------#
     #   sync_bn     是否使用sync_bn，DDP模式多卡可用
     #---------------------------------------------------------------------#
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     #      可以设置mosaic=True，直接随机初始化参数开始训练，但得到的效果仍然不如有预训练的情况。（像COCO这样的大数据集可以这样做）
     #   2、了解imagenet数据集，首先训练分类模型，获得网络的主干部分权值，分类模型的 主干部分 和该模型通用，基于此进行训练。
     #----------------------------------------------------------------------------------------------------------------------------#
-    model_path      = ''
+    model_path      = '/home/sunxusheng/projects/yolox/yolox-pytorch-main/logs/2022_08_29/ep100-loss2.180-val_loss2.145.pth'
     #------------------------------------------------------#
     #   input_shape     输入的shape大小，一定要是32的倍数 h, w
     #------------------------------------------------------#
@@ -146,7 +147,7 @@ if __name__ == "__main__":
     #                           Adam可以使用相对较小的UnFreeze_Epoch
     #   Unfreeze_batch_size     模型在解冻后的batch_size
     #------------------------------------------------------------------#
-    UnFreeze_Epoch      = 100
+    UnFreeze_Epoch      = 300
     Unfreeze_batch_size = 64
     #------------------------------------------------------------------#
     #   Freeze_Train    是否进行冻结训练
@@ -161,7 +162,7 @@ if __name__ == "__main__":
     #   Init_lr         模型的最大学习率
     #   Min_lr          模型的最小学习率，默认为最大学习率的0.01
     #------------------------------------------------------------------#
-    Init_lr             = 1e-2
+    Init_lr             = 1e-3
     Min_lr              = Init_lr * 0.01
     #------------------------------------------------------------------#
     #   optimizer_type  使用到的优化器种类，可选的有adam、sgd
@@ -171,13 +172,13 @@ if __name__ == "__main__":
     #   weight_decay    权值衰减，可防止过拟合
     #                   adam会导致weight_decay错误，使用adam时建议设置为0。
     #------------------------------------------------------------------#
-    optimizer_type      = "adam"
+    optimizer_type      = "sgd"
     momentum            = 0.937
     weight_decay        = 5e-4
     #------------------------------------------------------------------#
     #   lr_decay_type   使用到的学习率下降方式，可选的有step、cos
     #------------------------------------------------------------------#
-    lr_decay_type       = "cos"
+    lr_decay_type       = "step"
     #------------------------------------------------------------------#
     #   save_period     多少个epoch保存一次权值
     #------------------------------------------------------------------#
@@ -185,7 +186,7 @@ if __name__ == "__main__":
     #------------------------------------------------------------------#
     #   save_dir        权值与日志文件保存的文件夹
     #------------------------------------------------------------------#
-    save_dir            = 'logs/2022_08_29'
+    save_dir            = 'logs/2022_09_13'
     #------------------------------------------------------------------#
     #   eval_flag       是否在训练时进行评估，评估对象为验证集
     #                   安装pycocotools库后，评估体验更佳。
@@ -203,7 +204,7 @@ if __name__ == "__main__":
     #                   开启后会加快数据读取速度，但是会占用更多内存
     #                   内存较小的电脑可以设置为2或者0  
     #------------------------------------------------------------------#
-    num_workers         = 8
+    num_workers         = 16
 
     #----------------------------------------------------#
     #   获得图片路径和标签
@@ -421,14 +422,14 @@ if __name__ == "__main__":
                                             mosaic=False, mixup=False, mosaic_prob=0, mixup_prob=0, train=False, special_aug_ratio=0)
         
         if distributed:
-            train_sampler   = torch.utils.data.distributed.DistributedSampler(train_dataset, shuffle=True,)
+            train_sampler   = torch.utils.data.distributed.DistributedSampler(train_dataset, shuffle=False,)
             val_sampler     = torch.utils.data.distributed.DistributedSampler(val_dataset, shuffle=False,)
             batch_size      = batch_size // ngpus_per_node
             shuffle         = False
         else:
             train_sampler   = None
             val_sampler     = None
-            shuffle         = True
+            shuffle         = False
 
         gen             = DataLoader(train_dataset, shuffle = shuffle, batch_size = batch_size, num_workers = num_workers, pin_memory=True,
                                     drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
@@ -458,8 +459,8 @@ if __name__ == "__main__":
                 #   判断当前batch_size，自适应调整学习率
                 #-------------------------------------------------------------------#
                 nbs             = 64
-                lr_limit_max    = 1e-3 if optimizer_type == 'adam' else 5e-2
-                lr_limit_min    = 3e-4 if optimizer_type == 'adam' else 5e-4
+                lr_limit_max    = 1e-3 if optimizer_type == 'adam' else 5e-3
+                lr_limit_min    = 3e-4 if optimizer_type == 'adam' else 5e-5
                 Init_lr_fit     = min(max(batch_size / nbs * Init_lr, lr_limit_min), lr_limit_max)
                 Min_lr_fit      = min(max(batch_size / nbs * Min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
                 #---------------------------------------#
